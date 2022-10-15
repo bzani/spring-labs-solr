@@ -21,7 +21,7 @@ services:
     depends_on:
       - solr-server
     ports:
-      - 8083:8080
+      - 8083:8083
     environment:
       - SPRING_DATA_SOLR_HOST=http://solr-server:8983/solr
     networks:

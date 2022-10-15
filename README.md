@@ -35,15 +35,25 @@ In case you want to run Solr separately as docker container, you can follow the 
 Create the directory used as container volume and run Solr container:
 
 ```sh
-mkdir data
-sudo chown 8983:8983 data
-docker run --rm -d -v "$PWD/data:/var/solr" -p 8983:8983 --name solr-server solr solr-precreate products
+docker volume create solr-data
+docker network create solr-network
+docker run --rm -d -v solr-data:/var/solr -p 8983:8983 --network solr-network \
+	--name solr-server solr solr-precreate products
+```
+
+Buidl and run your application directly from maven or docker:
+
+```
+docker build -t solr-api .
+docker run --rm -d -p 8083:8083 --network solr-network --name solr-api \
+	-e SPRING_DATA_SOLR_HOST=http://solr-server:8983/solr solr-api
 ```
 
 ## Loading custom data
 
 ```sh
-docker run --rm -v "$PWD/mydata:/mydata" solr post -c products /mydata/products.csv
+docker run --rm -v "$PWD/mydata:/mydata" --network=solr-network \
+	solr post -c products /mydata/products.csv -host solr-server
 ```
 
 ## Source
